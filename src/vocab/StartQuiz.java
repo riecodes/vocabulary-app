@@ -332,7 +332,9 @@ public class StartQuiz extends JFrame {
                 
                 // Create a layered panel for absolute positioning of text over image
                 JPanel layeredHeaderPanel = new JPanel() {
-                    @Override
+                    private static final long serialVersionUID = 1L;
+
+					@Override
                     protected void paintComponent(Graphics g) {
                         super.paintComponent(g);
                         // Draw the banner image
@@ -547,12 +549,9 @@ public class StartQuiz extends JFrame {
     private class RoundedPanel extends JPanel {
         private static final long serialVersionUID = 1L;
         private final int cornerRadius;
-        private final Color bgColor;
-        
         public RoundedPanel(int radius, Color bgColor) {
             super();
             this.cornerRadius = radius;
-            this.bgColor = bgColor;
             setBackground(bgColor);
             setOpaque(false);
         }

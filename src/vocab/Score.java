@@ -97,7 +97,9 @@ public class Score extends JFrame {
                 
                 // Create a layered panel for absolute positioning of text over image
                 JPanel layeredHeaderPanel = new JPanel() {
-                    @Override
+                    private static final long serialVersionUID = 1L;
+
+					@Override
                     protected void paintComponent(Graphics g) {
                         super.paintComponent(g);
                         // Draw the banner image
@@ -217,7 +219,7 @@ public class Score extends JFrame {
             @Override
             public void componentResized(java.awt.event.ComponentEvent e) {
                 int panelWidth = contentPanel.getWidth();
-                int panelHeight = contentPanel.getHeight();
+//                int panelHeight = contentPanel.getHeight();
                 
                 // Get medal size
                 int medalWidth = medalLabel.getIcon() != null ? medalLabel.getIcon().getIconWidth() : 0;

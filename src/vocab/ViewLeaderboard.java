@@ -96,7 +96,9 @@ public class ViewLeaderboard extends JFrame {
                 
                 // Create a layered panel for absolute positioning of text over image
                 JPanel layeredHeaderPanel = new JPanel() {
-                    @Override
+                    private static final long serialVersionUID = 1L;
+
+					@Override
                     protected void paintComponent(Graphics g) {
                         super.paintComponent(g);
                         // Draw the banner image
