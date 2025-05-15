@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -297,38 +296,48 @@ public class StartVocab extends JFrame {
         arrowPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                arrowPanel.setBackground(new Color(255, 171, 139)); // Darker orange on hover
+                if (arrowPanel.isEnabled()) {
+                    arrowPanel.setBackground(new Color(255, 171, 139)); // Darker orange on hover
+                }
             }
             
             @Override
             public void mouseExited(MouseEvent e) {
-                arrowPanel.setBackground(new Color(255, 191, 159)); // Return to original color
+                if (arrowPanel.isEnabled()) {
+                    arrowPanel.setBackground(new Color(255, 191, 159)); // Return to original color
+                }
             }
             
             @Override
             public void mouseClicked(MouseEvent e) {
+                if (!arrowPanel.isEnabled()) {
+                    return; // Don't process click if disabled
+                }
+                
                 if (isRightArrow) {
                     // Next vocabulary item
                     if (!vocabItems.isEmpty()) {
                         currentIndex = (currentIndex + 1) % vocabItems.size();
                         displayVocabItem(currentIndex);
+                        // Enable left arrow when moving forward
+                        leftArrow.setEnabled(true);
+                        leftArrow.setBackground(new Color(255, 191, 159));
+                        
+                        // Check if we've completed the vocabulary
+                        if (currentIndex == 0) {
+                            showCompletionDialog();
+                        }
                     }
                 } else {
-                    // Exit to choose vocabulary screen
-                    int response = JOptionPane.showConfirmDialog(
-                        StartVocab.this,
-                        "Do you want to exit to the vocabulary selection screen?",
-                        "Exit Learning",
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE
-                    );
-                    
-                    if (response == JOptionPane.YES_OPTION) {
-                        dispose(); // Close current window
-                        SwingUtilities.invokeLater(() -> {
-                            ChooseVocab chooseScreen = new ChooseVocab();
-                            chooseScreen.setVisible(true);
-                        });
+                    // Previous vocabulary item
+                    if (!vocabItems.isEmpty()) {
+                        currentIndex = (currentIndex - 1 + vocabItems.size()) % vocabItems.size();
+                        displayVocabItem(currentIndex);
+                        // Disable left arrow if we're at the first item
+                        if (currentIndex == 0) {
+                            leftArrow.setEnabled(false);
+                            leftArrow.setBackground(new Color(200, 200, 200)); // Gray out when disabled
+                        }
                     }
                 }
             }
@@ -408,43 +417,54 @@ public class StartVocab extends JFrame {
             return;
         }
         
+        // Create a map to store image files for quick lookup
+        Map<String, File> imageFileMap = new HashMap<>();
         for (File imageFile : imageFiles) {
             String filename = imageFile.getName();
             if (filename.toLowerCase().endsWith(".png") || filename.toLowerCase().endsWith(".jpg")) {
-                // Extract word from filename
                 String word = filename.substring(0, filename.lastIndexOf(".")).toLowerCase();
+                imageFileMap.put(word, imageFile);
+            }
+        }
+        
+        // Add vocabulary items in the order they appear in the text file
+        for (String word : textDescriptions.keySet()) {
+            File imageFile = imageFileMap.get(word);
+            if (imageFile != null) {
+                System.out.println("Found matching image for word: " + word);
                 
-                // Check if we have a description for this word
-                if (textDescriptions.containsKey(word)) {
-                    System.out.println("Found matching image for word: " + word);
-                    
-                    // Check for audio file - now using .wav instead of .mp3
-                    File audioFile = new File("assets/school audio/" + word + " audio.wav");
-                    String audioPath = audioFile.exists() ? audioFile.getAbsolutePath() : null;
-                    
-                    // Add to vocabulary items
-                    vocabItems.add(new VocabItem(
-                        word,
-                        imageFile.getAbsolutePath(),
-                        audioPath,
-                        textDescriptions.get(word)
-                    ));
-                } else {
-                    System.out.println("No description found for image: " + filename);
-                }
+                // Check for audio file
+                File audioFile = new File("assets/school audio/" + word + " audio.wav");
+                String audioPath = audioFile.exists() ? audioFile.getAbsolutePath() : null;
+                
+                // Add to vocabulary items
+                vocabItems.add(new VocabItem(
+                    word,
+                    imageFile.getAbsolutePath(),
+                    audioPath,
+                    textDescriptions.get(word)
+                ));
+            } else {
+                System.out.println("No image found for word: " + word);
             }
         }
         
         System.out.println("Total vocabulary items loaded: " + vocabItems.size());
-        
-        // Shuffle the vocabulary items for randomization
-        Collections.shuffle(vocabItems);
     }
     
     // Display vocabulary item at the given index
     private void displayVocabItem(int index) {
         if (index >= 0 && index < vocabItems.size()) {
             VocabItem item = vocabItems.get(index);
+            
+            // Update left arrow state
+            if (index == 0) {
+                leftArrow.setEnabled(false);
+                leftArrow.setBackground(new Color(200, 200, 200)); // Gray out when disabled
+            } else {
+                leftArrow.setEnabled(true);
+                leftArrow.setBackground(new Color(255, 191, 159)); // Normal color when enabled
+            }
             
             // Load and display image
             try {
@@ -604,6 +624,33 @@ public class StartVocab extends JFrame {
                 "Audio Playback Error",
                 JOptionPane.ERROR_MESSAGE);
         });
+    }
+    
+    private void showCompletionDialog() {
+        String[] options = {"Restart", "Back to Menu"};
+        int choice = JOptionPane.showOptionDialog(
+            this,
+            "Congratulations! You've completed all vocabulary items.",
+            "Vocabulary Complete",
+            JOptionPane.DEFAULT_OPTION,
+            JOptionPane.INFORMATION_MESSAGE,
+            null,
+            options,
+            options[0]
+        );
+        
+        if (choice == 0) {
+            // Restart
+            currentIndex = 0;
+            displayVocabItem(currentIndex);
+        } else {
+            // Back to menu
+            dispose();
+            SwingUtilities.invokeLater(() -> {
+                ChooseVocab chooseScreen = new ChooseVocab();
+                chooseScreen.setVisible(true);
+            });
+        }
     }
     
     public static void main(String[] args) {
