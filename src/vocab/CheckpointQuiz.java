@@ -37,8 +37,9 @@ public class CheckpointQuiz extends JFrame {
             ge.registerFont(balsamiqBold);
             ge.registerFont(manjari);
         } catch (IOException | FontFormatException e) {
-            balsamiqBold = new Font("Arial", Font.BOLD, 48);
             manjari = new Font("Arial", Font.BOLD, 24);
+            balsamiqBold = new Font("Arial", Font.BOLD, 48);
+            
         }
         
         // Set up the frame
