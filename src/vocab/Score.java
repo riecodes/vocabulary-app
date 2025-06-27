@@ -151,7 +151,7 @@ public class Score extends JFrame {
             File medalFile = new File("assets/score/good job.png");
             if (medalFile.exists()) {
                 Image medalImage = ImageIO.read(medalFile);
-                // Scale medal to appropriate size - increase size to 0.15 (from 0.1)
+                // Scale medal to appropriate size
                 int newWidth = (int)(medalImage.getWidth(null) * 0.15);
                 int newHeight = (int)(medalImage.getHeight(null) * 0.15);
                 Image scaledMedalImage = medalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
@@ -162,9 +162,10 @@ public class Score extends JFrame {
             e.printStackTrace();
         }
         
-        // Create view leaderboard button
-        final RoundedPanel leaderboardButton = new RoundedPanel(20, new Color(235, 76, 76));
+        // Create view leaderboard button with fixed size
+        final RoundedPanel leaderboardButton = new RoundedPanel(20, new Color(233, 91, 91));
         leaderboardButton.setLayout(new GridBagLayout());
+        leaderboardButton.setSize(220, 60); // Fixed size
         
         // Create the label for the button
         JLabel leaderboardLabel = new JLabel("View Leaderboard");
@@ -177,12 +178,12 @@ public class Score extends JFrame {
         leaderboardButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                leaderboardButton.setBackground(new Color(235, 96, 96)); // Lighter version of #eb4c4c
+                leaderboardButton.setBackground(new Color(233, 111, 111));
             }
             
             @Override
             public void mouseExited(MouseEvent e) {
-                leaderboardButton.setBackground(new Color(235, 76, 76)); // #eb4c4c color
+                leaderboardButton.setBackground(new Color(233, 91, 91));
             }
             
             @Override
@@ -219,30 +220,30 @@ public class Score extends JFrame {
             @Override
             public void componentResized(java.awt.event.ComponentEvent e) {
                 int panelWidth = contentPanel.getWidth();
-//                int panelHeight = contentPanel.getHeight();
+                int panelHeight = contentPanel.getHeight();
                 
                 // Get medal size
                 int medalWidth = medalLabel.getIcon() != null ? medalLabel.getIcon().getIconWidth() : 0;
                 int medalHeight = medalLabel.getIcon() != null ? medalLabel.getIcon().getIconHeight() : 0;
                 
-                // Calculate position for centered leaderboard button
-                int buttonWidth = 300;
+                // Calculate center position
                 int centerX = panelWidth / 2;
-                int buttonX = centerX - (buttonWidth / 2);
                 
-                // Center the score title with the same center as the leaderboard button - moved up
+                // Center the score title
                 int scoreWidth = 200;
                 scoreTitleLabel.setBounds(centerX - (scoreWidth / 2), 120, scoreWidth, 40);
                 
-                // Center the score value with the same center as the leaderboard button - moved up
+                // Center the score value
                 int scoreValueWidth = 200;
                 scoreValueLabel.setBounds(centerX - (scoreValueWidth / 2), 170, scoreValueWidth, 50);
                 
-                // Position medal to the left of the centered score elements - moved up
+                // Position medal to the left of the centered score elements
                 medalLabel.setBounds(centerX - medalWidth - 50, 50, medalWidth, medalHeight);
                 
-                // Center the leaderboard button at the bottom - moved up
-                leaderboardButton.setBounds(buttonX, 300, buttonWidth, 60);
+                // Position the leaderboard button at the bottom center
+                int buttonX = centerX - (leaderboardButton.getWidth() / 2);
+                int buttonY = 300;
+                leaderboardButton.setLocation(buttonX, buttonY);
             }
         });
     }
